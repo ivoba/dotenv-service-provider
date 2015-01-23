@@ -1,0 +1,23 @@
+
+{
+    "name": "ivoba/dotenv-service-provider",
+    "description": "A dotenv ServiceProvider for Silex.",
+    "keywords": ["dotenv", "silex"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ivo Bathke",
+            "email": "ivo.bathke@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "silex/silex": "~1.0",
+        "vlucas/phpdotenv": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ivoba\\Silex\\": "src"
+        }
+    }
+}

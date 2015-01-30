@@ -2,6 +2,8 @@
 
 A [dotenv](https://github.com/vlucas/phpdotenv) ServiceProvider for [Silex](http://silex.sensiolabs.org)
 
+[![Build Status](http://img.shields.io/travis/ivoba/dotenv-service-provider.svg)](https://travis-ci.org/ivoba/dotenv-service-provider)
+
 #### Caution: this is highly overengineered!
 
 This will set all Env vars that have a given prefix, default is *SILEX_*, to $app as parameters.  

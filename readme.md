@@ -36,10 +36,11 @@ Register the Service:
     ]);
     $app['env.load'];
     
-Yo can add *default*, *required* and *allowed* config options for each var.  
+Yo can add *default*, *required*, *allowed* and *typecast* config options for each var.  
 
     $envOptions = ['env.options' => ['var_config' => ['hoo' => [EnvProvider::CONFIG_KEY_ALLOWED => 'this'],
                                                       'zack' => [EnvProvider::CONFIG_KEY_REQUIRED => true],
+                                                      'dong' => [EnvProvider::CONFIG_KEY_CAST => EnvProvider::CAST_TYPE_BOOLEAN],
                                                       'zip' => [EnvProvider::CONFIG_KEY_DEFAULT => 'zippi']]]];
     $app->register(new \Ivoba\Silex\EnvProvider(), $envOptions);
     $app['env.load'];

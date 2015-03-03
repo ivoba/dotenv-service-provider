@@ -51,9 +51,9 @@ class EnvServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $_ENV['SILEX_FLOAT'] = '23.234234';
         $_ENV['SILEX_BOOL']  = 'true';
-        $_ENV['SILEX_INT']    = '23';
-        $app                  = new Application();
-        $envOptions           = ['env.options' =>
+        $_ENV['SILEX_INT']   = '23';
+        $app                 = new Application();
+        $envOptions          = ['env.options' =>
             ['use_dotenv' => function () use ($app) {
                 return false;
             },
@@ -69,6 +69,32 @@ class EnvServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('int', $app['int']);
         $this->assertInternalType('boolean', $app['bool']);
         $this->assertInternalType('float', $app['float']);
+    }
+
+    public function test()
+    {
+        $_ENV['SILEX_DEBUG'] = 'false';
+        $_ENV['SILEX_REDIS_HOST'] = 'host';
+        $_ENV['SILEX_REDIS_PORT'] = 'port';
+
+        $app = new Application();
+
+        $envOptions = ['env.options' => [
+            'use_dotenv' => function () use ($app) {
+                return false;
+            },
+            'var_config' => [
+            'debug' => [EnvProvider::CONFIG_KEY_CAST => EnvProvider::CAST_TYPE_BOOLEAN],
+            'redis_port' => [EnvProvider::CONFIG_KEY_CAST => EnvProvider::CAST_TYPE_INT, EnvProvider::CONFIG_KEY_REQUIRED => true],
+            'redis_host' => [EnvProvider::CONFIG_KEY_REQUIRED => true]
+        ]
+        ]];
+
+
+        $app->register(new \Ivoba\Silex\EnvProvider(), $envOptions);
+        $app['env.load'];
+
+
     }
 
 

@@ -10,12 +10,18 @@ class EnvProvider implements ServiceProviderInterface
     const CONFIG_KEY_DEFAULT = 'default';
     const CONFIG_KEY_REQUIRED = 'required';
     const CONFIG_KEY_ALLOWED = 'allowed';
+    const CONFIG_KEY_CAST = 'typecast';
+
+    const CAST_TYPE_BOOLEAN = 'bool';
+    const CAST_TYPE_STRING = 'string';
+    const CAST_TYPE_INT = 'int';
+    const CAST_TYPE_FLOAT = 'float';
 
     /*
     'use_dotenv' => function($app){return ($app['env' !== 'prod'])},
     1. run EnvProvider, set all given vars to app
     2. if usedotenv, run dotenv and run envprovider again
-    3. @todo apply options, check for required, set default etc
+    3. apply options, check for required, set default etc
      */
 
     /**
@@ -29,7 +35,7 @@ class EnvProvider implements ServiceProviderInterface
                 return true;
             },
             'dotenv_dir' => __DIR__ . '/../../../..', //vendor/ivoba/dotenv-service-provider/src
-            'var_config' => [] //todo apply
+            'var_config' => []
         ];
 
         $app['env.load'] = $app->share(function ($app) {
@@ -73,6 +79,22 @@ class EnvProvider implements ServiceProviderInterface
 
             if (isset($options[self::CONFIG_KEY_ALLOWED])) {
                 \Dotenv::required($varName, $options[self::CONFIG_KEY_ALLOWED]);
+            }
+
+            if (isset($options[self::CONFIG_KEY_CAST])) {
+                switch ($options[self::CONFIG_KEY_CAST]) {
+                    case self::CAST_TYPE_INT:
+                        $app[$varName] = (int) $app[$varName];
+                        break;
+                    case self::CAST_TYPE_FLOAT:
+                        $app[$varName] = (float) $app[$varName];
+                        break;
+                    case self::CAST_TYPE_BOOLEAN:
+                        $app[$varName] = filter_var(($app[$varName]), FILTER_VALIDATE_BOOLEAN);
+                        break;
+                    default: //string
+                        break;
+                }
             }
 
         }

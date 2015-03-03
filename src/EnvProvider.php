@@ -73,12 +73,12 @@ class EnvProvider implements ServiceProviderInterface
 
             if (isset($options[self::CONFIG_KEY_REQUIRED])) {
                 if ($options[self::CONFIG_KEY_REQUIRED]) {
-                    \Dotenv::required($varName);
+                    \Dotenv::required($app['env.options']['prefix'] . '_'.strtoupper($varName));
                 }
             }
 
             if (isset($options[self::CONFIG_KEY_ALLOWED])) {
-                \Dotenv::required($varName, $options[self::CONFIG_KEY_ALLOWED]);
+                \Dotenv::required($app['env.options']['prefix'] . '_'.strtoupper($varName), $options[self::CONFIG_KEY_ALLOWED]);
             }
 
             if (isset($options[self::CONFIG_KEY_CAST])) {

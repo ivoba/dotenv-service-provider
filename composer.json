@@ -11,13 +11,21 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
-        "silex/silex": "~1.0",
-        "vlucas/phpdotenv": "~1.1"
+        "php": ">=5.5.9",
+        "silex/silex": "^2.0",
+        "vlucas/phpdotenv": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
     },
     "autoload": {
         "psr-4": {
             "Ivoba\\Silex\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ivoba\\Silex\\Tests\\": "tests"
         }
     }
 }

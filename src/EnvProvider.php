@@ -1,8 +1,8 @@
 <?php
 namespace Ivoba\Silex;
 
-use Silex\Application;
-use Silex\ServiceProviderInterface;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
 
 class EnvProvider implements ServiceProviderInterface
 {
@@ -27,18 +27,18 @@ class EnvProvider implements ServiceProviderInterface
     /**
      * @inheritdoc
      */
-    public function register(Application $app)
+    public function register(Container $app)
     {
         $app['env.default_options'] = [
             'prefix' => 'SILEX',
             'use_dotenv' => function () {
                 return true;
             },
-            'dotenv_dir' => __DIR__ . '/../../../..', //vendor/ivoba/dotenv-service-provider/src
-            'var_config' => []
+            'dotenv_dir' => __DIR__.'/../../../..', //vendor/ivoba/dotenv-service-provider/src
+            'var_config' => [],
         ];
 
-        $app['env.load'] = $app->share(function ($app) {
+        $app['env.load'] = function ($app) {
             if (!isset($app['env.options'])) {
                 $app['env.options'] = [];
             }
@@ -52,17 +52,17 @@ class EnvProvider implements ServiceProviderInterface
             }
 
             $this->applyConfigs($app, $app['env.options']['var_config']);
-        });
+        };
 
     }
 
     /**
      * applies config options to expected vars
      *
-     * @param Application $app
+     * @param Container $app
      * @param $config
      */
-    protected function applyConfigs(Application $app, $config)
+    protected function applyConfigs(Container $app, $config)
     {
         foreach ($config as $varName => $options) {
             if (isset($options[self::CONFIG_KEY_DEFAULT])) {
@@ -73,21 +73,24 @@ class EnvProvider implements ServiceProviderInterface
 
             if (isset($options[self::CONFIG_KEY_REQUIRED])) {
                 if ($options[self::CONFIG_KEY_REQUIRED]) {
-                    \Dotenv::required($app['env.options']['prefix'] . '_'.strtoupper($varName));
+                    \Dotenv::required($app['env.options']['prefix'].'_'.strtoupper($varName));
                 }
             }
 
             if (isset($options[self::CONFIG_KEY_ALLOWED])) {
-                \Dotenv::required($app['env.options']['prefix'] . '_'.strtoupper($varName), $options[self::CONFIG_KEY_ALLOWED]);
+                \Dotenv::required(
+                    $app['env.options']['prefix'].'_'.strtoupper($varName),
+                    $options[self::CONFIG_KEY_ALLOWED]
+                );
             }
 
             if (isset($options[self::CONFIG_KEY_CAST])) {
                 switch ($options[self::CONFIG_KEY_CAST]) {
                     case self::CAST_TYPE_INT:
-                        $app[$varName] = (int) $app[$varName];
+                        $app[$varName] = (int)$app[$varName];
                         break;
                     case self::CAST_TYPE_FLOAT:
-                        $app[$varName] = (float) $app[$varName];
+                        $app[$varName] = (float)$app[$varName];
                         break;
                     case self::CAST_TYPE_BOOLEAN:
                         $app[$varName] = filter_var(($app[$varName]), FILTER_VALIDATE_BOOLEAN);
@@ -104,16 +107,20 @@ class EnvProvider implements ServiceProviderInterface
     /**
      * collect vars and sets them to the DIC
      *
-     * @param Application $app
+     * @param Container $app
      */
-    protected function addEnvVarsToApp(Application $app)
+    protected function addEnvVarsToApp(Container $app)
     {
-        $hasPrefix       = function ($elem) use ($app) {
-            return strpos($elem, $app['env.options']['prefix'] . '_') !== false;
+        $hasPrefix = function ($elem) use ($app) {
+            return strpos($elem, $app['env.options']['prefix'].'_') !== false;
         };
         $arrayFilterKeys = function ($input, $callback) {
             if (!is_array($input)) {
-                trigger_error('array_filter_key() expects parameter 1 to be array, ' . gettype($input) . ' given', E_USER_WARNING);
+                trigger_error(
+                    'array_filter_key() expects parameter 1 to be array, '.gettype($input).' given',
+                    E_USER_WARNING
+                );
+
                 return null;
             }
 
@@ -136,17 +143,10 @@ class EnvProvider implements ServiceProviderInterface
         foreach ($envVars as $envVar => $empty) {
             $var = \Dotenv::findEnvironmentVariable($envVar);
             if ($var) {
-                $key       = strtolower(str_replace($app['env.options']['prefix'] . '_', '', $envVar));
+                $key = strtolower(str_replace($app['env.options']['prefix'].'_', '', $envVar));
                 $app[$key] = $var;
             }
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function boot(Application $app)
-    {
     }
 
 }
